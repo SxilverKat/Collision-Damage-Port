@@ -22,7 +22,12 @@ public class ClientEventHandler {
         Vec3 motion = player.getDeltaMovement();
         double motionX = motion.x;
         double motionZ = motion.z;
-        double curMotionCombined = ((double) ((int) (Math.sqrt((motionX * motionX) + (motionZ * motionZ)) * 20 * 100))) / 100;
+        double squareSum = (motionX * motionX) + (motionZ * motionZ);
+        if (Config.includeYAxis && motion.y > 0) {
+            double motionY = motion.y;
+            squareSum += motionY * motionY;
+        }
+        double curMotionCombined = ((double) ((int) (Math.sqrt(squareSum) * 20 * 100))) / 100;
 
         double prevMotionCombined = player.getPersistentData().getDouble("prevMotionCombined");
         player.getPersistentData().putDouble("prevMotionCombined", curMotionCombined);
@@ -32,7 +37,9 @@ public class ClientEventHandler {
         if (Config.ignoreInWater && player.isInWater()) return;
 
         double accel = prevMotionCombined - curMotionCombined;
-        if (accel > 5 && player.horizontalCollision) {
+        boolean ceilingCollision = player.verticalCollision && !player.verticalCollisionBelow;
+        boolean collided = player.horizontalCollision || (Config.includeYAxis && ceilingCollision);
+        if (accel > 5 && collided) {
             PacketHandler.INSTANCE.sendToServer(new PacketCollisionS(accel));
         }
     }

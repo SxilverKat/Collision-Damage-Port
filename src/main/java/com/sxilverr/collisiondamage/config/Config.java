@@ -35,6 +35,10 @@ public class Config {
             .comment("Skip collision damage while in water.")
             .define("ignoreInWater", false);
 
+    private static final ForgeConfigSpec.BooleanValue INCLUDE_Y_AXIS = BUILDER
+            .comment("Include Y axis collision damage from upward impacts.")
+            .define("includeYAxis", false);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static double accelerationThreshold;
@@ -43,6 +47,7 @@ public class Config {
     public static double maxDamage;
     public static boolean ignoreWhenRiding;
     public static boolean ignoreInWater;
+    public static boolean includeYAxis;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -53,5 +58,6 @@ public class Config {
         maxDamage = MAX_DAMAGE.get();
         ignoreWhenRiding = IGNORE_WHEN_RIDING.get();
         ignoreInWater = IGNORE_IN_WATER.get();
+        includeYAxis = INCLUDE_Y_AXIS.get();
     }
 }
