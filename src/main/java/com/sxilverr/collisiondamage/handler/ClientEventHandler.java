@@ -39,7 +39,7 @@ public class ClientEventHandler {
         double accel = prevMotionCombined - curMotionCombined;
         boolean ceilingCollision = player.verticalCollision && !player.verticalCollisionBelow;
         boolean collided = player.horizontalCollision || (Config.includeYAxis && ceilingCollision);
-        if (accel > 5 && collided) {
+        if (accel > Config.accelerationThreshold && collided) {
             PacketHandler.INSTANCE.sendToServer(new PacketCollisionS(accel));
         }
     }
