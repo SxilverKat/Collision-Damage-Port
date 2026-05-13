@@ -8,7 +8,7 @@ version="${mod_version}"
 displayName="${mod_name}"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/collision-damage-port"
 logoFile="title.png"
-credits="Original mod by fonnymunkey, Ported to 1.20.1 by Sxilverr"
+credits="Original mod by fonnymunkey, Ported to 1.20.1 and 1.21.1 by Sxilverr"
 authors="${mod_authors}"
 description='''${mod_description}'''
 

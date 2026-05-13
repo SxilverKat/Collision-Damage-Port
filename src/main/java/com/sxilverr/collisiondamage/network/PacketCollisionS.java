@@ -5,9 +5,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.minecraftforge.event.network.CustomPayloadEvent;
 
 public class PacketCollisionS {
 
@@ -25,28 +23,28 @@ public class PacketCollisionS {
         return new PacketCollisionS(buf.readDouble());
     }
 
-    public static void handle(PacketCollisionS msg, Supplier<NetworkEvent.Context> ctxSupplier) {
-        NetworkEvent.Context ctx = ctxSupplier.get();
-        ctx.enqueueWork(() -> {
-            ServerPlayer player = ctx.getSender();
-            if (player == null) return;
+    public static void handle(PacketCollisionS msg, CustomPayloadEvent.Context ctx) {
+        ServerPlayer player = ctx.getSender();
+        if (player == null) {
+            ctx.setPacketHandled(true);
+            return;
+        }
 
-            double accel = msg.accel;
-            if (accel > Config.accelerationThreshold) {
-                float damageValue = ((float) Math.round((accel - Config.accelerationThreshold) * 4 * Config.damageMultiplier)) / 4;
+        double accel = msg.accel;
+        if (accel > Config.accelerationThreshold) {
+            float damageValue = ((float) Math.round((accel - Config.accelerationThreshold) * 4 * Config.damageMultiplier)) / 4;
 
-                if (Config.maxDamage > 0 && damageValue > Config.maxDamage) {
-                    damageValue = (float) Config.maxDamage;
-                }
-
-                player.playSound(damageValue > 4 ? SoundEvents.GENERIC_BIG_FALL : SoundEvents.GENERIC_SMALL_FALL, 1.0F, 1.0F);
-
-                DamageSource source = Config.damageTypeWall
-                        ? player.damageSources().flyIntoWall()
-                        : player.damageSources().fall();
-                player.hurt(source, damageValue);
+            if (Config.maxDamage > 0 && damageValue > Config.maxDamage) {
+                damageValue = (float) Config.maxDamage;
             }
-        });
+
+            player.playSound(damageValue > 4 ? SoundEvents.GENERIC_BIG_FALL : SoundEvents.GENERIC_SMALL_FALL, 1.0F, 1.0F);
+
+            DamageSource source = Config.damageTypeWall
+                    ? player.damageSources().flyIntoWall()
+                    : player.damageSources().fall();
+            player.hurt(source, damageValue);
+        }
         ctx.setPacketHandled(true);
     }
 }

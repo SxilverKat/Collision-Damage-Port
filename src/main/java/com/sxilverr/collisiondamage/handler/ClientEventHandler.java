@@ -10,15 +10,16 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
 @Mod.EventBusSubscriber(modid = CollisionDamage.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ClientEventHandler {
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.START || event.player == null || !event.player.level().isClientSide) return;
-
+    public static void onPlayerTick(TickEvent.PlayerTickEvent.Post event) {
         Player player = event.player;
+        if (player == null || !player.level().isClientSide) return;
+
         Vec3 motion = player.getDeltaMovement();
         double motionX = motion.x;
         double motionZ = motion.z;
@@ -39,8 +40,8 @@ public class ClientEventHandler {
         double accel = prevMotionCombined - curMotionCombined;
         boolean ceilingCollision = player.verticalCollision && !player.verticalCollisionBelow;
         boolean collided = player.horizontalCollision || (Config.includeYAxis && ceilingCollision);
-        if (accel > 5 && collided) {
-            PacketHandler.INSTANCE.sendToServer(new PacketCollisionS(accel));
+        if (accel > Config.accelerationThreshold && collided) {
+            PacketHandler.INSTANCE.send(new PacketCollisionS(accel), PacketDistributor.SERVER.noArg());
         }
     }
 }
