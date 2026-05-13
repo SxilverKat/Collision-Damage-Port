@@ -1,50 +1,50 @@
 package com.sxilverr.collisiondamage.network;
 
+import com.sxilverr.collisiondamage.CollisionDamage;
 import com.sxilverr.collisiondamage.config.Config;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public class PacketCollisionS {
+public record PacketCollisionS(double accel) implements CustomPacketPayload {
 
-    private final double accel;
+    public static final Type<PacketCollisionS> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(CollisionDamage.MODID, "collision_s"));
 
-    public PacketCollisionS(double accel) {
-        this.accel = accel;
+    public static final StreamCodec<RegistryFriendlyByteBuf, PacketCollisionS> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.DOUBLE, PacketCollisionS::accel,
+            PacketCollisionS::new
+    );
+
+    @Override
+    public Type<? extends CustomPacketPayload> type() {
+        return TYPE;
     }
 
-    public static void encode(PacketCollisionS msg, FriendlyByteBuf buf) {
-        buf.writeDouble(msg.accel);
-    }
+    public static void handle(PacketCollisionS msg, IPayloadContext ctx) {
+        ctx.enqueueWork(() -> {
+            if (!(ctx.player() instanceof ServerPlayer player)) return;
 
-    public static PacketCollisionS decode(FriendlyByteBuf buf) {
-        return new PacketCollisionS(buf.readDouble());
-    }
+            double accel = msg.accel;
+            if (accel > Config.accelerationThreshold) {
+                float damageValue = ((float) Math.round((accel - Config.accelerationThreshold) * 4 * Config.damageMultiplier)) / 4;
 
-    public static void handle(PacketCollisionS msg, CustomPayloadEvent.Context ctx) {
-        ServerPlayer player = ctx.getSender();
-        if (player == null) {
-            ctx.setPacketHandled(true);
-            return;
-        }
+                if (Config.maxDamage > 0 && damageValue > Config.maxDamage) {
+                    damageValue = (float) Config.maxDamage;
+                }
 
-        double accel = msg.accel;
-        if (accel > Config.accelerationThreshold) {
-            float damageValue = ((float) Math.round((accel - Config.accelerationThreshold) * 4 * Config.damageMultiplier)) / 4;
+                player.playSound(damageValue > 4 ? SoundEvents.GENERIC_BIG_FALL : SoundEvents.GENERIC_SMALL_FALL, 1.0F, 1.0F);
 
-            if (Config.maxDamage > 0 && damageValue > Config.maxDamage) {
-                damageValue = (float) Config.maxDamage;
+                DamageSource source = Config.damageTypeWall
+                        ? player.damageSources().flyIntoWall()
+                        : player.damageSources().fall();
+                player.hurt(source, damageValue);
             }
-
-            player.playSound(damageValue > 4 ? SoundEvents.GENERIC_BIG_FALL : SoundEvents.GENERIC_SMALL_FALL, 1.0F, 1.0F);
-
-            DamageSource source = Config.damageTypeWall
-                    ? player.damageSources().flyIntoWall()
-                    : player.damageSources().fall();
-            player.hurt(source, damageValue);
-        }
-        ctx.setPacketHandled(true);
+        });
     }
 }

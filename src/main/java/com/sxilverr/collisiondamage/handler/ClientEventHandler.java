@@ -3,21 +3,20 @@ package com.sxilverr.collisiondamage.handler;
 import com.sxilverr.collisiondamage.CollisionDamage;
 import com.sxilverr.collisiondamage.config.Config;
 import com.sxilverr.collisiondamage.network.PacketCollisionS;
-import com.sxilverr.collisiondamage.network.PacketHandler;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
-@Mod.EventBusSubscriber(modid = CollisionDamage.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = CollisionDamage.MODID, value = Dist.CLIENT)
 public class ClientEventHandler {
 
     @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent.Post event) {
-        Player player = event.player;
+    public static void onPlayerTick(PlayerTickEvent.Post event) {
+        Player player = event.getEntity();
         if (player == null || !player.level().isClientSide) return;
 
         Vec3 motion = player.getDeltaMovement();
@@ -39,9 +38,12 @@ public class ClientEventHandler {
 
         double accel = prevMotionCombined - curMotionCombined;
         boolean ceilingCollision = player.verticalCollision && !player.verticalCollisionBelow;
-        boolean collided = player.horizontalCollision || (Config.includeYAxis && ceilingCollision);
+        boolean prevCeilingCollision = player.getPersistentData().getBoolean("prevCeilingCollision");
+        player.getPersistentData().putBoolean("prevCeilingCollision", ceilingCollision);
+        boolean newCeilingCollision = ceilingCollision && !prevCeilingCollision;
+        boolean collided = player.horizontalCollision || (Config.includeYAxis && newCeilingCollision);
         if (accel > Config.accelerationThreshold && collided) {
-            PacketHandler.INSTANCE.send(new PacketCollisionS(accel), PacketDistributor.SERVER.noArg());
+            PacketDistributor.sendToServer(new PacketCollisionS(accel));
         }
     }
 }

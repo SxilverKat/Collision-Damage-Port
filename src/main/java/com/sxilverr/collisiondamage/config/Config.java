@@ -1,45 +1,45 @@
 package com.sxilverr.collisiondamage.config;
 
 import com.sxilverr.collisiondamage.CollisionDamage;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
-@Mod.EventBusSubscriber(modid = CollisionDamage.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = CollisionDamage.MODID)
 public class Config {
 
-    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
-    private static final ForgeConfigSpec.DoubleValue ACCELERATION_THRESHOLD = BUILDER
+    private static final ModConfigSpec.DoubleValue ACCELERATION_THRESHOLD = BUILDER
             .comment("How large the player's deceleration must be before they will begin taking damage. (Measured in meters per second)")
             .defineInRange("accelerationThreshold", 12.0D, 5.0D, 100.0D);
 
-    private static final ForgeConfigSpec.DoubleValue DAMAGE_MULTIPLIER = BUILDER
+    private static final ModConfigSpec.DoubleValue DAMAGE_MULTIPLIER = BUILDER
             .comment("Multiplies the damage taken when over the threshold. Default 1.0x is 1 damage per 1m/s/s over threshold.")
             .defineInRange("damageMultiplier", 1.0D, 0.0D, 100.0D);
 
-    private static final ForgeConfigSpec.BooleanValue DAMAGE_TYPE_WALL = BUILDER
+    private static final ModConfigSpec.BooleanValue DAMAGE_TYPE_WALL = BUILDER
             .comment("Use damage type FLY_INTO_WALL? If false, will instead use FALL. (Set this to false if you want stuff like feather-falling to affect collision damage as well)")
             .define("damageTypeWall", true);
 
-    private static final ForgeConfigSpec.DoubleValue MAX_DAMAGE = BUILDER
+    private static final ModConfigSpec.DoubleValue MAX_DAMAGE = BUILDER
             .comment("Maximum damage per hit. Set to 0 for no cap.")
             .defineInRange("maxDamage", 0.0D, 0.0D, 1000.0D);
 
-    private static final ForgeConfigSpec.BooleanValue IGNORE_WHEN_RIDING = BUILDER
+    private static final ModConfigSpec.BooleanValue IGNORE_WHEN_RIDING = BUILDER
             .comment("Skip collision damage while riding (boats, horses, etc).")
             .define("ignoreWhenRiding", false);
 
-    private static final ForgeConfigSpec.BooleanValue IGNORE_IN_WATER = BUILDER
+    private static final ModConfigSpec.BooleanValue IGNORE_IN_WATER = BUILDER
             .comment("Skip collision damage while in water.")
             .define("ignoreInWater", false);
 
-    private static final ForgeConfigSpec.BooleanValue INCLUDE_Y_AXIS = BUILDER
+    private static final ModConfigSpec.BooleanValue INCLUDE_Y_AXIS = BUILDER
             .comment("Include Y axis collision damage from upward impacts.")
             .define("includeYAxis", false);
 
-    public static final ForgeConfigSpec SPEC = BUILDER.build();
+    public static final ModConfigSpec SPEC = BUILDER.build();
 
     public static double accelerationThreshold;
     public static double damageMultiplier;
