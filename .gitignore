@@ -26,3 +26,9 @@ forge*changelog.txt
 
 # Claude Code local settings
 .claude
+CLAUDE.md
+MEMORY.md
+.cognilayer
+.codex
+memory
+.cache
