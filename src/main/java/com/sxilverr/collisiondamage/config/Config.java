@@ -39,6 +39,14 @@ public class Config {
             .comment("Include Y axis collision damage from upward impacts.")
             .define("includeYAxis", false);
 
+    private static final ForgeConfigSpec.BooleanValue DAMAGE_VEHICLE = BUILDER
+            .comment("Damage the vehicle when the rider triggers collision damage.")
+            .define("damageVehicle", true);
+
+    private static final ForgeConfigSpec.BooleanValue GLOBAL_COLLISION_DAMAGE = BUILDER
+            .comment("Apply collision damage to all living entities.")
+            .define("globalCollisionDamage", false);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     public static double accelerationThreshold;
@@ -48,6 +56,8 @@ public class Config {
     public static boolean ignoreWhenRiding;
     public static boolean ignoreInWater;
     public static boolean includeYAxis;
+    public static boolean damageVehicle;
+    public static boolean globalCollisionDamage;
 
     @SubscribeEvent
     static void onLoad(final ModConfigEvent event) {
@@ -59,5 +69,7 @@ public class Config {
         ignoreWhenRiding = IGNORE_WHEN_RIDING.get();
         ignoreInWater = IGNORE_IN_WATER.get();
         includeYAxis = INCLUDE_Y_AXIS.get();
+        damageVehicle = DAMAGE_VEHICLE.get();
+        globalCollisionDamage = GLOBAL_COLLISION_DAMAGE.get();
     }
 }

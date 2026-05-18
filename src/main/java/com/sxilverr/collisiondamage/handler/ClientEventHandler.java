@@ -4,6 +4,7 @@ import com.sxilverr.collisiondamage.CollisionDamage;
 import com.sxilverr.collisiondamage.config.Config;
 import com.sxilverr.collisiondamage.network.PacketCollisionS;
 import com.sxilverr.collisiondamage.network.PacketHandler;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -19,7 +20,8 @@ public class ClientEventHandler {
         if (event.phase == TickEvent.Phase.START || event.player == null || !event.player.level().isClientSide) return;
 
         Player player = event.player;
-        Vec3 motion = player.getDeltaMovement();
+        Entity source = player.isPassenger() ? player.getRootVehicle() : player;
+        Vec3 motion = source.getDeltaMovement();
         double motionX = motion.x;
         double motionZ = motion.z;
         double squareSum = (motionX * motionX) + (motionZ * motionZ);
@@ -37,8 +39,11 @@ public class ClientEventHandler {
         if (Config.ignoreInWater && player.isInWater()) return;
 
         double accel = prevMotionCombined - curMotionCombined;
-        boolean ceilingCollision = player.verticalCollision && !player.verticalCollisionBelow;
-        boolean collided = player.horizontalCollision || (Config.includeYAxis && ceilingCollision);
+        boolean ceilingCollision = source.verticalCollision && !source.verticalCollisionBelow;
+        boolean prevCeilingCollision = player.getPersistentData().getBoolean("prevCeilingCollision");
+        player.getPersistentData().putBoolean("prevCeilingCollision", ceilingCollision);
+        boolean newCeilingCollision = ceilingCollision && !prevCeilingCollision;
+        boolean collided = source.horizontalCollision || (Config.includeYAxis && newCeilingCollision);
         if (accel > Config.accelerationThreshold && collided) {
             PacketHandler.INSTANCE.sendToServer(new PacketCollisionS(accel));
         }
