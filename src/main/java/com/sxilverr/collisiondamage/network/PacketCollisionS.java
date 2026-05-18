@@ -2,14 +2,15 @@ package com.sxilverr.collisiondamage.network;
 
 import com.sxilverr.collisiondamage.CollisionDamage;
 import com.sxilverr.collisiondamage.config.Config;
+import com.sxilverr.collisiondamage.handler.CollisionDamageHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record PacketCollisionS(double accel) implements CustomPacketPayload {
@@ -31,19 +32,16 @@ public record PacketCollisionS(double accel) implements CustomPacketPayload {
             if (!(ctx.player() instanceof ServerPlayer player)) return;
 
             double accel = msg.accel;
-            if (accel > Config.accelerationThreshold) {
-                float damageValue = ((float) Math.round((accel - Config.accelerationThreshold) * 4 * Config.damageMultiplier)) / 4;
+            CollisionDamageHelper.applyCollisionDamage(player, accel);
 
-                if (Config.maxDamage > 0 && damageValue > Config.maxDamage) {
-                    damageValue = (float) Config.maxDamage;
+            if (Config.damageVehicle && player.isPassenger()) {
+                Entity vehicle = player.getRootVehicle();
+                if (vehicle != player) {
+                    boolean handledByGlobal = Config.globalCollisionDamage && vehicle instanceof LivingEntity;
+                    if (!handledByGlobal) {
+                        CollisionDamageHelper.applyCollisionDamage(vehicle, accel);
+                    }
                 }
-
-                player.playSound(damageValue > 4 ? SoundEvents.GENERIC_BIG_FALL : SoundEvents.GENERIC_SMALL_FALL, 1.0F, 1.0F);
-
-                DamageSource source = Config.damageTypeWall
-                        ? player.damageSources().flyIntoWall()
-                        : player.damageSources().fall();
-                player.hurt(source, damageValue);
             }
         });
     }
