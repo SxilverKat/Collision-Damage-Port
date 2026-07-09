@@ -10,7 +10,7 @@ displayName = "${name}"
 authors = "fonnymunkey, Sxilverr"
 description = "Adds acceleration-based collision damage to the player."
 logoFile = "title.png"
-credits = "Original mod by fonnymunkey, Ported to 1.20.1 and 1.21.1 by Sxilverr"
+credits = "Original mod by fonnymunkey, Ported by Sxilverr"
 displayURL = "https://www.curseforge.com/minecraft/mc-mods/collision-damage-port"
 
 [[dependencies.${id}]]
