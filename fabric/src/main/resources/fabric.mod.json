@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "id": "${id}",
+  "version": "${version}",
+  "name": "${name}",
+  "description": "Adds acceleration-based collision damage to the player.",
+  "authors": [
+    "fonnymunkey",
+    "Sxilverr"
+  ],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/collision-damage-port",
+    "issues": "https://www.curseforge.com/minecraft/mc-mods/collision-damage-port"
+  },
+  "license": "MIT",
+  "icon": "title.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.sxilverr.collisiondamage.fabric.CollisionDamageFabric"
+    ],
+    "client": [
+      "com.sxilverr.collisiondamage.fabric.CollisionDamageFabricClient"
+    ],
+    "modmenu": [
+      "com.sxilverr.collisiondamage.fabric.ModMenuIntegration"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.16",
+    "minecraft": "${minecraft}",
+    "fabric-api": "*",
+    "cloth-config": "*"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

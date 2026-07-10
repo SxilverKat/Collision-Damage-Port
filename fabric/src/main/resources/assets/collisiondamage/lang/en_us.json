@@ -1,0 +1,21 @@
+{
+  "text.autoconfig.collisiondamage.title": "Collision Damage",
+  "text.autoconfig.collisiondamage.option.accelerationThreshold": "Acceleration Threshold",
+  "text.autoconfig.collisiondamage.option.accelerationThreshold.@Tooltip": "How large the player's deceleration must be before they begin taking damage (measured in m/s).",
+  "text.autoconfig.collisiondamage.option.damageMultiplier": "Damage Multiplier",
+  "text.autoconfig.collisiondamage.option.damageMultiplier.@Tooltip": "Multiplies the damage taken over the threshold. Default 1.0x is 1 damage per 1 m/s over threshold.",
+  "text.autoconfig.collisiondamage.option.damageTypeWall": "Use Wall Damage Type",
+  "text.autoconfig.collisiondamage.option.damageTypeWall.@Tooltip": "Use the FLY_INTO_WALL damage type. If false, uses FALL (so feather falling, etc. also affects collision damage).",
+  "text.autoconfig.collisiondamage.option.maxDamage": "Max Damage",
+  "text.autoconfig.collisiondamage.option.maxDamage.@Tooltip": "Maximum damage per hit. Set to 0 for no cap.",
+  "text.autoconfig.collisiondamage.option.ignoreWhenRiding": "Ignore When Riding",
+  "text.autoconfig.collisiondamage.option.ignoreWhenRiding.@Tooltip": "Skip collision damage while riding (boats, horses, etc.).",
+  "text.autoconfig.collisiondamage.option.ignoreInWater": "Ignore In Water",
+  "text.autoconfig.collisiondamage.option.ignoreInWater.@Tooltip": "Skip collision damage while in water.",
+  "text.autoconfig.collisiondamage.option.includeYAxis": "Include Y Axis",
+  "text.autoconfig.collisiondamage.option.includeYAxis.@Tooltip": "Include Y axis collision damage from upward impacts.",
+  "text.autoconfig.collisiondamage.option.damageVehicle": "Damage Vehicle",
+  "text.autoconfig.collisiondamage.option.damageVehicle.@Tooltip": "Damage the vehicle when the rider triggers collision damage.",
+  "text.autoconfig.collisiondamage.option.globalCollisionDamage": "Global Collision Damage",
+  "text.autoconfig.collisiondamage.option.globalCollisionDamage.@Tooltip": "Apply collision damage to all living entities, not just players."
+}
